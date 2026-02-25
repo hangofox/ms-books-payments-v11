@@ -22,7 +22,7 @@ public interface VentaRepository extends JpaRepository <Venta, Long> {
   List<Venta> findByIdUsuario(Long idUsuario);
   
   //CONSULTA PARA OBTENER LA VENTA DE UN USUARIO CON UN ESTADO ESPECÍFICO:
-  Optional<Venta> findByIdUsuarioAndEstadoVenta(Long idUsuario, EstadoVenta estadoVenta);
+  List<Venta> findByIdUsuarioAndEstadoVenta(Long idUsuario, EstadoVenta estadoVenta);
   
   //CONSULTA PARA CONTAR CUÁNTOS ÍTEMS TIENE LA VENTA INGRESADA DE UN USUARIO:
   @Query(nativeQuery = true, value = "SELECT IFNULL(SUM(p.cantidad_item),0)" +

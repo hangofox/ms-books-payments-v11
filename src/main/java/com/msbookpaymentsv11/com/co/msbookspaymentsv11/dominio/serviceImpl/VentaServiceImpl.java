@@ -11,6 +11,7 @@ import com.msbookpaymentsv11.com.co.msbookspaymentsv11.dominio.service.VentaServ
 import com.msbookpaymentsv11.com.co.msbookspaymentsv11.persistencia.dao.VentaDAO;
 import com.msbookpaymentsv11.com.co.msbookspaymentsv11.persistencia.entity.Venta;
 import com.msbookpaymentsv11.com.co.msbookspaymentsv11.persistencia.repository.VentaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -45,13 +46,22 @@ public class VentaServiceImpl implements VentaService {
   
   //CREAR REGISTRO:
   @Override
+  @Transactional
   public MessageResponseDTO crearVenta(VentaDTO ventaDTO) {
-    Venta nuevaVenta = ventaRepository.save(ventaDAO.venta(ventaDTO));
+    Long idNuevaVenta = null;
+    List<Venta> ventasCreadas = ventaRepository.findByIdUsuarioAndEstadoVenta(ventaDTO.getIdUsuario(), EstadoVenta.INGRESADA);
+
+    if(ventasCreadas == null || ventasCreadas.isEmpty()){
+      Venta nuevaVenta = ventaRepository.save(ventaDAO.venta(ventaDTO));
+      idNuevaVenta = nuevaVenta.getIdVenta();
+    } else {
+      idNuevaVenta = ventasCreadas.get(ventasCreadas.size() - 1).getIdVenta();
+    }
     
     return MessageResponseDTO.builder()
         .status(MensajeRespuesta.EXITO_REGISTRO_CREADO.getStatus())
         .message(MensajeRespuesta.EXITO_REGISTRO_CREADO.getMensaje())
-        .idCreated(nuevaVenta.getIdVenta())
+        .idCreated(idNuevaVenta)
         .build();
   }
   
@@ -94,11 +104,11 @@ public class VentaServiceImpl implements VentaService {
   //LEER CONSULTA DE LA VENTA EN ESTADO INGRESADA POR ID DE USUARIO:
   @Override
   public VentaDTO obtenerVentaIngresada(Long idUsuario) {
-    Optional<Venta> venta = ventaRepository.findByIdUsuarioAndEstadoVenta(idUsuario, EstadoVenta.INGRESADA);
-    if (venta.isEmpty()) {
+    List<Venta> ventas = ventaRepository.findByIdUsuarioAndEstadoVenta(idUsuario, EstadoVenta.INGRESADA);
+    if (ventas == null || ventas.isEmpty()) {
       throw new BusinessException(MensajeRespuesta.ERROR_REGISTRO_NO_ENCONTRADO);
     }
-    return ventaDAO.ventaDTO(venta.get());
+    return ventaDAO.ventaDTO(ventas.get(ventas.size() - 1));
   }
   
   //LEER CONSULTA: CUÁNTOS ÍTEMS TIENE LA VENTA ACTIVA DEL USUARIO:
