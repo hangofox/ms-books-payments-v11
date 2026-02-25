@@ -18,7 +18,7 @@ import java.util.Optional;
 public interface ProductoFacturadoRepository extends JpaRepository<ProductoFacturado, Long> {
   
   //CONSULTA PARA CONTAR CUÁNTOS LIBROS FACTURADOS HAY POR ID DE LIBRO:
-  @Query(nativeQuery = true, value = "SELECT SUM(id_libro) FROM tbl_productos_facturados WHERE id_libro = :idLibro")
+  @Query(nativeQuery = true, value = "SELECT COUNT(*) FROM tbl_productos_facturados WHERE id_libro = :idLibro")
   Integer cuantosLibrosFacturadosXIdLibro(@Param("idLibro") Long idLibro);
   
   //CONSULTA PARA OBTENER LOS PRODUCTOS FACTURADOS POR ID DE VENTA:
