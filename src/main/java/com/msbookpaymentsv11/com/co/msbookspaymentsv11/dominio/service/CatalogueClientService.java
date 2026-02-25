@@ -29,7 +29,7 @@ public class CatalogueClientService {
   * Constructor que inicializa el WebClient apuntando al microservicio de catálogo.
   */
   public CatalogueClientService(WebClient.Builder builder) {
-    this.webClient = builder.baseUrl("lb://catalogue-service").build();
+    this.webClient = builder.baseUrl("https://ms-books-catalogue-v11-production.up.railway.app").build();
   }
   
   /**
