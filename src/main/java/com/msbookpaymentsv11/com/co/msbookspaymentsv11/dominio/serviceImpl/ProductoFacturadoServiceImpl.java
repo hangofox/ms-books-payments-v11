@@ -6,8 +6,6 @@ import com.msbookpaymentsv11.com.co.msbookspaymentsv11.dominio.dto.MessageRespon
 import com.msbookpaymentsv11.com.co.msbookspaymentsv11.dominio.exception.BusinessException;
 import com.msbookpaymentsv11.com.co.msbookspaymentsv11.dominio.Constantes.MensajeRespuesta;
 import com.msbookpaymentsv11.com.co.msbookspaymentsv11.dominio.dto.ProductoFacturadoDTO;
-import com.msbookpaymentsv11.com.co.msbookspaymentsv11.dominio.dto.KardexInventarioDTO;
-import com.msbookpaymentsv11.com.co.msbookspaymentsv11.dominio.service.CatalogueClientService;
 import com.msbookpaymentsv11.com.co.msbookspaymentsv11.dominio.service.ProductoFacturadoService;
 import com.msbookpaymentsv11.com.co.msbookspaymentsv11.persistencia.dao.ProductoFacturadoDAO;
 import com.msbookpaymentsv11.com.co.msbookspaymentsv11.persistencia.entity.ProductoFacturado;
@@ -33,22 +31,13 @@ public class ProductoFacturadoServiceImpl implements ProductoFacturadoService {
   @Autowired//INYECTAMOS EL REPOSITORIO.
   private ProductoFacturadoRepository productoFacturadoRepository;
   
-  @Autowired//INYECTAMOS EL SERVICIO CLIENTE DEL CATÁLOGO.
-  //private CatalogueClientService catalogueClientService;
-  
+
   //CREAR REGISTRO:
   @Override
   public MessageResponseDTO crearProductoFacturado(ProductoFacturadoDTO productoFacturadoDTO) {
     Long idLibro = productoFacturadoDTO.getIdLibro();
     Long idVenta = productoFacturadoDTO.getIdVenta();
     Integer cantidad = productoFacturadoDTO.getCantidadItem();
-    
-    //Revisa el catalogue para traer el stock:
-    /*Integer stock = catalogueClientService.getStock(idLibro);
-    
-    if (stock == null || stock < cantidad) {
-      throw new BusinessException(MensajeRespuesta.ERROR_STOCK_INSUFICIENTE);
-    }*/
     
     Optional<ProductoFacturado> productoExistente = productoFacturadoRepository.buscarExistente(idVenta, idLibro);
     
@@ -58,12 +47,7 @@ public class ProductoFacturadoServiceImpl implements ProductoFacturadoService {
           return productoFacturadoRepository.save(p);
         })
         .orElseGet(() -> productoFacturadoRepository.save(productoFacturadoDAO.productoFacturado(productoFacturadoDTO)));
-    
-    //Registra la salida del inventario:
-    /*KardexInventarioDTO salidaDTO = new KardexInventarioDTO();
-    salidaDTO.setIdLibro(idLibro);
-    salidaDTO.setCantidadInventario(cantidad);
-    catalogueClientService.registrarSalidaInventario(salidaDTO);*/
+
     
     return MessageResponseDTO.builder()
         .status(MensajeRespuesta.EXITO_REGISTRO_CREADO.getStatus())
@@ -82,16 +66,8 @@ public class ProductoFacturadoServiceImpl implements ProductoFacturadoService {
        throw new BusinessException(MensajeRespuesta.ERROR_REGISTRO_NO_ENCONTRADO);
     }
     
-    Long idLibro = productoFacturado.get().getIdLibro();
-    Integer cantidad = productoFacturado.get().getCantidadItem();
-    
     productoFacturadoRepository.deleteById(idProductoFacturado);
-    
-    //Registra la entrada del inventario al eliminar el producto facturado:
-    /*KardexInventarioDTO entradaDTO = new KardexInventarioDTO();
-    entradaDTO.setIdLibro(idLibro);
-    entradaDTO.setCantidadInventario(cantidad);
-    catalogueClientService.registrarEntradaInventario(entradaDTO);*/
+
   }
   
   //LEER CONSULTA: CUÁNTOS PRODUCTOS FACTURADOS HAY POR ID DE LIBRO:
