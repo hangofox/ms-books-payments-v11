@@ -34,7 +34,7 @@ public class ProductoFacturadoServiceImpl implements ProductoFacturadoService {
   private ProductoFacturadoRepository productoFacturadoRepository;
   
   @Autowired//INYECTAMOS EL SERVICIO CLIENTE DEL CATÁLOGO.
-  private CatalogueClientService catalogueClientService;
+  //private CatalogueClientService catalogueClientService;
   
   //CREAR REGISTRO:
   @Override
@@ -44,11 +44,11 @@ public class ProductoFacturadoServiceImpl implements ProductoFacturadoService {
     Integer cantidad = productoFacturadoDTO.getCantidadItem();
     
     //Revisa el catalogue para traer el stock:
-    Integer stock = catalogueClientService.getStock(idLibro);
+    /*Integer stock = catalogueClientService.getStock(idLibro);
     
     if (stock == null || stock < cantidad) {
       throw new BusinessException(MensajeRespuesta.ERROR_STOCK_INSUFICIENTE);
-    }
+    }*/
     
     Optional<ProductoFacturado> productoExistente = productoFacturadoRepository.buscarExistente(idVenta, idLibro);
     
@@ -60,10 +60,10 @@ public class ProductoFacturadoServiceImpl implements ProductoFacturadoService {
         .orElseGet(() -> productoFacturadoRepository.save(productoFacturadoDAO.productoFacturado(productoFacturadoDTO)));
     
     //Registra la salida del inventario:
-    KardexInventarioDTO salidaDTO = new KardexInventarioDTO();
+    /*KardexInventarioDTO salidaDTO = new KardexInventarioDTO();
     salidaDTO.setIdLibro(idLibro);
     salidaDTO.setCantidadInventario(cantidad);
-    catalogueClientService.registrarSalidaInventario(salidaDTO);
+    catalogueClientService.registrarSalidaInventario(salidaDTO);*/
     
     return MessageResponseDTO.builder()
         .status(MensajeRespuesta.EXITO_REGISTRO_CREADO.getStatus())
@@ -88,10 +88,10 @@ public class ProductoFacturadoServiceImpl implements ProductoFacturadoService {
     productoFacturadoRepository.deleteById(idProductoFacturado);
     
     //Registra la entrada del inventario al eliminar el producto facturado:
-    KardexInventarioDTO entradaDTO = new KardexInventarioDTO();
+    /*KardexInventarioDTO entradaDTO = new KardexInventarioDTO();
     entradaDTO.setIdLibro(idLibro);
     entradaDTO.setCantidadInventario(cantidad);
-    catalogueClientService.registrarEntradaInventario(entradaDTO);
+    catalogueClientService.registrarEntradaInventario(entradaDTO);*/
   }
   
   //LEER CONSULTA: CUÁNTOS PRODUCTOS FACTURADOS HAY POR ID DE LIBRO:
